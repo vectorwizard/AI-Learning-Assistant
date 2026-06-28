@@ -8,11 +8,11 @@ const router = express.Router();
 //All routes are protected
 router.use(protect);
 
-
-router.get('/', getAllFlashcardSets);
-router.get('/:documentId', getFlashcards);
-router.post('/:cardId/review', reviewFlashcard);
-router.put('/:cardId/star', toggleStarFlashcard);
-router.delete('/:id', deleteFlashcardSet);
+router.post('/generate-flashcards', generateFlashcards);
+router.post('/generate-quiz', generateQuiz);
+router.post('/generate-summary', generateSummary);
+router.post('/chat', chat);
+router.post('/explain-concept', explainConcept);
+router.get('/chat-history/:documentId', getChatHistory);
 
 export default router;
