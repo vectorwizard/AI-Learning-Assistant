@@ -2,7 +2,7 @@ import Document from '../models/Document.js'
 import Flashcard from '../models/Flashcard.js'
 import Quiz from '../models/Quiz.js'
 import { extractTextFromPDF } from '../utils/pdfParser.js'
-import { chuckText } from '../utils/textChunker.js'
+import { chunkText } from '../utils/textChunker.js'
 import fs from "fs/promises";
 import mongoose from "mongoose";
 
@@ -43,7 +43,7 @@ export const uploadDocument = async (req, res, next) => {
             status: 'processing'
         })
 
-        //Process pDF in background
+        //Process PDF in background
         processPDF(document._id, req.file.path).catch(err => {
             console.error('PDF processing error:', err);
         });
@@ -62,11 +62,88 @@ export const uploadDocument = async (req, res, next) => {
     }
 };
 
-// @desc Get All user documents
-// @route GET/api/documents
-// @access Private
+//Helper func to process PDF
+const processPDF = async (documentId, filePath) => {
+    try {
+        const { text } = await extractTextFromPDF(filePath);
+
+        //Create chunks
+        const chunks = chunkText(text, 500, 50);
+
+        //Update Document
+        await Document.findByIdAndUpdate(documentId, {
+            extractedText: text,
+            chunks: chunks,
+            status: 'ready'
+        });
+
+        console.log(`Document ${documentId} processed successfully`)
+    } catch (error) {
+        console.error(`Error processing Document ${documentId}:`, error);
+
+        await Document.findByIdAndUpdate(documentId, {
+            status: 'failed'
+        });
+    }
+}
+
+// @desc    Get all user documents
+// @route   GET /api/documents
+// @access  Private
 export const getDocuments = async (req, res, next) => {
     try {
+        const documents = await Document.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(req.user._id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "flashcards",
+                    localField: "_id",
+                    foreignField: "documentId",
+                    as: "flashcardSets"
+                }
+            },
+            {
+                $lookup: {
+                    from: "quizzes",
+                    localField: "_id",
+                    foreignField: "documentId",
+                    as: "quizzes"
+                }
+            },
+            {
+                $addFields: {
+                    flashcardCount: {
+                        $size: "$flashcardSets"
+                    },
+                    quizCount: {
+                        $size: "$quizzes"
+                    }
+                }
+            },
+            {
+                $project: {
+                    extractedText: 0,
+                    chunks: 0,
+                    flashcardSets: 0,
+                    quizzes: 0
+                }
+            },
+            {
+                $sort: {
+                    uploadDate: -1
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            count: documents.length,
+            data: documents
+        });
 
     } catch (error) {
         next(error);
@@ -78,7 +155,35 @@ export const getDocuments = async (req, res, next) => {
 // @access Private
 export const getDocument = async (req, res, next) => {
     try {
+        const document = await Document.findOne({
+            _id: req.params.id,
+            userId: req.user._id
+        });
 
+        if (!document) {
+            return res.status(404).json({
+                success: false,
+                error: "Document Not found", statusCode: 404
+            });
+        }
+
+        //Get counts of associated flashcards and quizzes
+        const flashcardCount = await Flashcard.countDocuments({ documentId: document._id, userId: req.user._id })
+        const quizCount = await Quiz.countDocuments({ documentId: document._id, userId: req.user._id })
+
+        //Update last accessed
+        document.lastAccessed = Date.now();
+        await document.save();
+
+        //Combine document data with counts
+        const documentData = document.toObject();
+        documentData.flashcardCount = flashcardCount
+        documentData.quizCount = quizCount
+
+        res.status(200).json({
+            success: true,
+            data: documentData
+        });
     } catch (error) {
         next(error);
     }
@@ -89,18 +194,28 @@ export const getDocument = async (req, res, next) => {
 // @access Private
 export const deleteDocument = async (req, res, next) => {
     try {
+        const document = await Document.findOne({
+            _id: req.params.id,
+            userId: req.user._id
+        });
 
-    } catch (error) {
-        next(error);
-    }
-};
+        if (!document) {
+            return res.status(404).json({
+                success: false,
+                error: "Document Not found", statusCode: 404
+            });
+        }
 
-// @desc Update Document Title
-// @route PUT/api/documents/:id
-// @access Private
-export const updateDocument = async (req, res, next) => {
-    try {
+        //Delete file from file System
+        await fs.unlink(document.filePath).catch(() => {});
 
+        //Delete document
+        await document.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: "Document deleted successfully"
+        });
     } catch (error) {
         next(error);
     }

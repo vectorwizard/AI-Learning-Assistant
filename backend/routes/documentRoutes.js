@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadDocument, deleteDocument, updateDocument, getDocument, getDocuments } from "../controllers/documentController.js";
+import { uploadDocument, deleteDocument, getDocument, getDocuments } from "../controllers/documentController.js";
 import protect from '../middleware/auth.js'
 import upload from '../config/multer.js'
 
@@ -12,6 +12,5 @@ router.post('/upload', upload.single('file'), uploadDocument);
 router.get('/', getDocuments);
 router.get('/:id', getDocument);
 router.delete('/:id', deleteDocument);
-router.put('/"id', updateeDocument);
 
 export default router;
