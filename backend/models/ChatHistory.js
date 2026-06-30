@@ -17,6 +17,10 @@ const chatHistorySchema = new mongoose.Schema({
             enum: ['user', 'assistant'],
             required: true
         },
+        content: {
+            type: String,
+            required: true
+        },
         timestamp: {
             type: Date,
             default: Date.now,

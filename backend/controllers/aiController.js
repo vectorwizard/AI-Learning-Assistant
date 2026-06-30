@@ -295,7 +295,7 @@ export const explainConcept = async (req, res, next) => {
 // @access Private
 export const getChatHistory = async (req, res, next) => {
     try {
-        const { documentId } = req.body;
+        const { documentId } = req.params;
 
         if (!documentId) {
             return res.status(400).json({
