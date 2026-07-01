@@ -168,8 +168,8 @@ const QuizResultPage = () => {
                   </h4>
                 </div>
                 <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${isCorrect
-                    ? 'bg-emerald-50 border-2 border-emerald-200'
-                    : 'bg-rose-50 border-2 border-rose-200'
+                  ? 'bg-emerald-50 border-2 border-emerald-200'
+                  : 'bg-rose-50 border-2 border-rose-200'
                   }`}>
                   {isCorrect ? (
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" strokeWidth={2.5} />
@@ -189,19 +189,19 @@ const QuizResultPage = () => {
                     <div
                       key={optIndex}
                       className={`relative px-4 py-3 rounded-lg border-2 transition-all duration-200 ${isCorrectOption
-                          ? 'bg-emerald-50 border-emerald-300 shadow-lg shadow-emerald-100'
-                          : isWrongAnswer
-                            ? 'bg-rose-50 border-rose-300'
-                            : 'bg-slate-50 border-slate-200'
+                        ? 'bg-emerald-50 border-emerald-300 shadow-lg shadow-emerald-100'
+                        : isWrongAnswer
+                          ? 'bg-rose-50 border-rose-300'
+                          : 'bg-slate-50 border-slate-200'
                         }`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span
                           className={`text-sm font-medium ${isCorrectOption
-                              ? 'text-emerald-900'
-                              : isWrongAnswer
-                                ? 'text-rose-900'
-                                : 'text-slate-700'
+                            ? 'text-emerald-900'
+                            : isWrongAnswer
+                              ? 'text-rose-900'
+                              : 'text-slate-700'
                             }`}
                         >
                           {option}
@@ -230,7 +230,7 @@ const QuizResultPage = () => {
               {result.explanation && (
                 <div className="mt-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex">
                   <div className='pr-3'>
-                      <BookOpen className="w-8 h-6 text-slate-600" strokeWidth={2} />
+                    <BookOpen className="w-8 h-6 text-slate-600" strokeWidth={2} />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-blue-700 mb-1">Explanation</p>
@@ -242,6 +242,20 @@ const QuizResultPage = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Action Button */}
+      <div className="mt-8 flex justify-center">
+        <Link to={`/documents/${quiz.document._id}`}>
+          <button className="group relative px-8 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden">
+            <span className="relative z-10 flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Return to Document
+            </span>
+
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+          </button>
+        </Link>
       </div>
     </div>
   );
