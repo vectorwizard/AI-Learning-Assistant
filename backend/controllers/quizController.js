@@ -84,7 +84,6 @@ export const submitQuiz = async (req, res, next) => {
             });
         }
 
-        // Process Answers
         let correctcnt = 0;
         const userAnswers = [];
 
@@ -93,11 +92,20 @@ export const submitQuiz = async (req, res, next) => {
 
             let isCorrect = false;
 
-            if (questionIndex < quiz.questions.length) {
+            if (questionIndex >= 0 && questionIndex < quiz.questions.length) {
                 const question = quiz.questions[questionIndex];
-                isCorrect = selectedAnswer === question.correctAnswer;
 
-                if (isCorrect) correctcnt++;
+                // Example: ["O3"] -> "O3" -> 2
+                const optionIndex =
+                    Number(question.correctAnswer[0].replace("O", "")) - 1;
+
+                const correctAnswer = question.options[optionIndex];
+
+                isCorrect = selectedAnswer === correctAnswer;
+
+                if (isCorrect) {
+                    correctcnt++;
+                }
             }
 
             userAnswers.push({
@@ -108,12 +116,10 @@ export const submitQuiz = async (req, res, next) => {
             });
         });
 
-        // Calculate score
         const score = Math.round(
             (correctcnt / quiz.totalQuestions) * 100
         );
 
-        // Update Quiz
         quiz.userAnswers = userAnswers;
         quiz.score = score;
         quiz.completedAt = new Date();
