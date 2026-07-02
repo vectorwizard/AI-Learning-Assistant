@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, FileText, Clock, HardDrive } from "lucide-react";
 import toast from "react-hot-toast";
 import documentService from "../../services/documentService";
 import Spinner from "../../components/common/Spinner";
@@ -10,6 +10,7 @@ import ChatInterface from "../../components/chat/ChatInterface";
 import AIActions from "../../components/ai/AIActions";
 import FlashcardManager from "../../components/flashcards/FlashcardManager";
 import QuizManager from "../../components/quizzes/QuizManager";
+import moment from "moment";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -24,7 +25,7 @@ const DocumentDetailPage = () => {
         const data = await documentService.getDocumentById(id);
         setDocument(data);
       } catch (error) {
-        toast.error("Failed to fetch documents.");
+        toast.error("Failed to fetch document.");
         console.error(error);
       } finally {
         setLoading(false);
@@ -34,82 +35,100 @@ const DocumentDetailPage = () => {
     fetchDocumentDetails();
   }, [id]);
 
-  // Helper function to get the full PDF URL
-  const getPdfUrl = () => {
-  if (!document?.data?.filePath) return null;
-
-  const filePath = document.data.filePath;
-
-  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-    return encodeURI(filePath); 
-  }
-
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  
-  // 1. Remove trailing slash from baseUrl if it exists
-  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  
-  // 2. Ensure filePath starts with exactly one slash
-  const cleanPath = filePath.startsWith('/') ? filePath : `/${filePath}`;
-
-  // 3. Combine and encode to safely handle spaces in filenames
-  return encodeURI(`${cleanBase}${cleanPath}`);
-};
+  const formatFileSize = (bytes) => {
+    if (!bytes) return 'N/A';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes;
+    let unitIndex = 0;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
+  };
 
   const renderContent = () => {
-    if (loading) {
-      return <Spinner />;
-    }
-    if (!document || !document.data || !document.data.filePath) {
-      return <div className="">PDF not available.</div>;
+    if (loading) return <Spinner />;
+
+    const doc = document?.data;
+
+    if (!doc?.extractedText) {
+      return (
+        <div className="flex flex-col items-center justify-center py-16 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 mb-4">
+            <FileText className="w-7 h-7 text-slate-400" strokeWidth={2} />
+          </div>
+          <p className="text-slate-500 text-sm">
+            {doc?.status === 'processing'
+              ? 'Document is still being processed...'
+              : 'No content available for this document.'}
+          </p>
+        </div>
+      );
     }
 
-    const pdfUrl = getPdfUrl();
-    console.log(pdfUrl)
     return (
-      <div className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-        <div className="flex items-center justify-between p-4 bg-gray-50 border-b border-gray-300">
-          <span className="text-sm font-medium text-gray-700">Document Viewer</span>
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700"
-          >
-            <ExternalLink size={16} />
-            Open in new tab
-          </a>
+      <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden">
+
+        {/* Document Meta Bar */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+          <div className="flex items-center gap-4">
+            <div className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-linear-to-br from-emerald-500 to-teal-500">
+              <FileText className="w-4 h-4 text-white" strokeWidth={2} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">{doc.fileName}</p>
+              <div className="flex items-center gap-3 mt-0.5">
+                <span className="flex items-center gap-1 text-xs text-slate-500">
+                  <HardDrive className="w-3 h-3" strokeWidth={2} />
+                  {formatFileSize(doc.fileSize)}
+                </span>
+                <span className="flex items-center gap-1 text-xs text-slate-500">
+                  <Clock className="w-3 h-3" strokeWidth={2} />
+                  Uploaded {moment(doc.uploadDate).fromNow()}
+                </span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  doc.status === 'ready'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : doc.status === 'processing'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {doc.status}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="text-xs text-slate-400 font-medium">
+            {doc.extractedText.split(/\s+/).length.toLocaleString()} words
+          </div>
         </div>
-        <div className="bg-gray-100 p-1">
-          <iframe
-            src={pdfUrl}
-            className="w-full h-[70vh] bg-white rounded border border-gray-300"
-            title="PDF Viewer"
-            frameBorder="0"
-            style={{
-              colorScheme: 'light',
-            }}
-          />
+
+        {/* Extracted Text */}
+        <div className="p-6 max-h-[70vh] overflow-y-auto">
+          <div className="prose prose-slate max-w-none">
+            {doc.extractedText
+              .split('\n')
+              .filter(line => line.trim())
+              .map((paragraph, index) => (
+                <p
+                  key={index}
+                  className="text-sm text-slate-700 leading-relaxed mb-3 last:mb-0"
+                >
+                  {paragraph.trim()}
+                </p>
+              ))}
+          </div>
         </div>
+
       </div>
     );
   };
 
-  const renderChat = () => {
-    return <ChatInterface/>
-  };
-
-  const renderAIActions = () => {
-    return <AIActions/>
-  };
-
-  const renderFlashcardsTab = () => {
-    return <FlashcardManager documentId={id}/>
-  };
-
-  const renderQuizzesTab = () => {
-    return <QuizManager documentId={id}/>
-  };
+  const renderChat = () => <ChatInterface />;
+  const renderAIActions = () => <AIActions />;
+  const renderFlashcardsTab = () => <FlashcardManager documentId={id} />;
+  const renderQuizzesTab = () => <QuizManager documentId={id} />;
 
   const tabs = [
     { name: 'Content', label: 'Content', content: renderContent() },
@@ -119,26 +138,36 @@ const DocumentDetailPage = () => {
     { name: 'Quizzes', label: 'Quizzes', content: renderQuizzesTab() },
   ];
 
-  if (loading) {
-    return <Spinner />;
-  }
+  if (loading) return <Spinner />;
 
   if (!document) {
-    return <div className="text-center p-8">Document not found.</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-slate-600">Document not found.</p>
+      </div>
+    );
   }
 
   return (
     <div>
       <div className="mb-4">
-        <Link to="/documents" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-          <ArrowLeft size={16} />
+        <Link
+          to="/documents"
+          className="group inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+        >
+          <ArrowLeft
+            size={16}
+            className="group-hover:-translate-x-1 transition-transform duration-200"
+          />
           Back to Documents
         </Link>
       </div>
+
       <PageHeader title={document.data.title} />
+
       <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
-  )
-}
+  );
+};
 
-export default DocumentDetailPage
+export default DocumentDetailPage;
