@@ -75,7 +75,7 @@ flowchart LR
 | Layer | Tech |
 |---|---|
 | Frontend | React (JavaScript/JSX), Vite — deployed on **Vercel** |
-| Backend | Node.js, Express |
+| Backend | Node.js, Express — deployed on **Render** |
 | Database | MongoDB |
 | AI | Google **Gemini API** — chat, summaries, concept explanations, flashcard & quiz generation |
 | File Uploads | Multer |
@@ -240,7 +240,7 @@ GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ```bash
-npm run server
+npm run dev
 ```
 
 ### Frontend Setup
@@ -258,17 +258,7 @@ VITE_API_URL=http://localhost:8000
 npm run dev
 ```
 
----
 
-## 🗺️ Roadmap
-
-- [ ] Spaced-repetition scheduling for flashcards
-- [ ] Support for more file types (docx, pptx)
-- [ ] Progress analytics and quiz score trends over time
-- [ ] Shareable flashcard/quiz sets between users
-- [ ] Adaptive quiz difficulty based on past performance
-
----
 
 ## 🙏 Acknowledgments
 
