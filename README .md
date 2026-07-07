@@ -1,110 +1,94 @@
 # 📚 AI Learning Assistant
 
-
-```
-Upload your **PDF study materials** and let AI transform them into an
-interactive learning companion. Chat with documents, generate summaries,
-explain concepts, and automatically create flashcards and quizzes.
+Upload your **PDF study materials** and let AI transform them into an interactive learning companion. Chat with documents, generate summaries, explain concepts, and automatically create flashcards and quizzes.
 
 **🌐 Live Demo:** https://ai-learning-assistant-ruby-chi.vercel.app
 
-------------------------------------------------------------------------
+---
 
 # 📑 Table of Contents
 
--   Overview
--   Features
--   Architecture
--   Tech Stack
--   Project Structure
--   Screenshots
--   How It Works
--   API Overview
--   Security
--   Static File Serving
--   Deployment
--   Getting Started
--   Roadmap
+- Overview
+- Features
+- Architecture
+- Tech Stack
+- Project Structure
+- Screenshots
+- How It Works
+- API Overview
+- Security
+- Static File Serving
+- Deployment
+- Getting Started
+- Roadmap
 
-------------------------------------------------------------------------
+---
 
 # 📖 Overview
 
-AI Learning Assistant is a full-stack MERN application that helps
-students learn more effectively from PDF study materials.
+AI Learning Assistant is a full-stack MERN application that helps students learn more effectively from PDF study materials.
 
-Instead of repeatedly reading notes, users can upload a document and
-immediately:
+Instead of repeatedly reading notes, users can upload a document and immediately:
 
--   Chat with the document
--   Generate summaries
--   Explain difficult concepts
--   Create flashcards
--   Generate MCQ quizzes
--   Track learning progress
+- Chat with the document
+- Generate summaries
+- Explain difficult concepts
+- Create flashcards
+- Generate MCQ quizzes
+- Track learning progress
 
-The project is built using **React (JavaScript)**, **Node.js**,
-**Express**, **MongoDB**, and **Google Gemini API**.
+The project is built using **React (JavaScript)**, **Node.js**, **Express**, **MongoDB**, and **Google Gemini API**.
 
-------------------------------------------------------------------------
+---
 
 # ✨ Features
 
 ## Dashboard
-
--   Learning statistics
--   Recent activity
--   Flashcard and quiz counts
+- Learning statistics
+- Recent activity
+- Flashcard and quiz counts
 
 ## Document Management
-
--   Upload PDF documents
--   Organize study material
--   Delete documents
+- Upload PDF documents
+- Organize study material
+- Delete documents
 
 ## Document Viewer
-
--   Paginated extracted text viewer
+- Paginated extracted text viewer
 
 ## AI Features
-
--   Context-aware document chat
--   AI Summary
--   Explain Concept
+- Context-aware document chat
+- AI Summary
+- Explain Concept
 
 ## Flashcards
-
--   Automatic generation
--   Star important cards
--   Review tracking
+- Automatic generation
+- Star important cards
+- Review tracking
 
 ## Quizzes
-
--   AI-generated MCQs
--   Multiple attempts
--   Detailed review
+- AI-generated MCQs
+- Multiple attempts
+- Detailed review
 
 ## Profile
-
--   Update profile
--   Change password
+- Update profile
+- Change password
 
 ## Authentication
+- JWT authentication
+- Protected API routes
 
--   JWT authentication
--   Protected API routes
-
-------------------------------------------------------------------------
+---
 
 # 🏗️ Architecture
 
-``` mermaid
+```mermaid
 flowchart LR
 Client --> Express
 Express --> MongoDB
 Express --> Gemini
 Express --> Multer
-```
 
 ------------------------------------------------------------------------
 
