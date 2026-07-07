@@ -10,7 +10,7 @@ Upload your study materials and let AI turn them into a full learning workflow �
 
 Studying from raw PDFs and notes usually means re-reading the same pages, manually making flashcards, and guessing what to quiz yourself on. **AI Learning Assistant** turns any uploaded document into an interactive study companion: chat with it directly, ask for summaries or concept breakdowns, and generate flashcard sets and quizzes on demand — all tracked from a single dashboard.
 
-It's built end-to-end on the **MERN stack** (MongoDB, Express, React, Node.js), with the frontend written in **JavaScript (JSX)** rather than TypeScript. Google's **Gemini API** powers all the AI functionality — chat, summaries, concept explanations, flashcard generation, and quiz generation.
+It's built end-to-end on the **MERN stack** (MongoDB, Express, React, Node.js), with the frontend written in **JavaScript (JSX)** . Google's **Gemini API** powers all the AI functionality — chat, summaries, concept explanations, flashcard generation, and quiz generation.
 
 ---
 
@@ -240,7 +240,7 @@ GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ```bash
-npm run server
+npm run dev
 ```
 
 ### Frontend Setup
