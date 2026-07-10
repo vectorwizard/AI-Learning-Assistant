@@ -122,10 +122,10 @@ ai-learning-assistant/
 ![Documents](./screenshots/documents.png)
 
 **Document Content View**
-![Content View](./screenshots/content-view.png)
+![Content View](./screenshots/document-view.png)
 
 **AI Chat**
-![Chat](./screenshots/chat.png)
+![Chat](./screenshots/ai-chat.png)
 
 **AI Actions**
 ![AI Actions](./screenshots/ai-actions.png)
